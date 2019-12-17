@@ -78,9 +78,30 @@ class TelegramOutput(Bot, OutputChannel):
             button_list = []
             for bttn in buttons:
                 if isinstance(bttn, list):
-                    button_list.append([KeyboardButton(s["title"]) for s in bttn])
+                    for s in bttn:
+                        location_flag = False
+                        contact_flag = False
+                        try:
+                            location_flag = s["request_location"]
+                        except Exception as e:
+                            logger.error("request_location not defined. Using default value of False.")
+                        try:
+                            contact_flag = s["request_contact"]
+                        except Exception as e:
+                            logger.error("request_contact not defined. Using default value of False.")
+                        button_list.append([KeyboardButton(s["title"],contact_flag,location_flag)])
                 else:
-                    button_list.append([KeyboardButton(bttn["title"])])
+                    location_flag = False
+                    contact_flag = False
+                    try:
+                        location_flag = bttn["request_location"]
+                    except Exception as e:
+                        logger.error("request_location not defined. Using default value of False.")
+                    try:
+                        contact_flag = bttn["request_contact"]
+                    except Exception as e:
+                        logger.error("request_contact not defined. Using default value of False.")
+                    button_list.append([KeyboardButton(bttn["title"],contact_flag,location_flag)])
             reply_markup = ReplyKeyboardMarkup(
                 button_list, resize_keyboard=True, one_time_keyboard=True
             )
